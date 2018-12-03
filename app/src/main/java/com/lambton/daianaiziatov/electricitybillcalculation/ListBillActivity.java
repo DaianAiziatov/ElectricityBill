@@ -47,6 +47,7 @@ public class ListBillActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                db.getBillDao().delete(billList.get(position));
                 customAdapter.remove(billList.get(position));
             }
         });

@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class LoginActivity extends AppCompatActivity {
 
     private String userEmail, password;
@@ -26,20 +29,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        userEmailEditText = (EditText) findViewById(R.id.user_email_edit_view);
-        userPasswordEditText = (EditText) findViewById(R.id.user_password_edit_view);
-        rememberMeSwitch = (Switch) findViewById(R.id.rememberme_switch);
-        loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
-        loginPrefsEditor = loginPreferences.edit();
-
-        saveLogin = loginPreferences.getBoolean("saveLogin", false);
-        if (saveLogin == true) {
-            userEmailEditText.setText(loginPreferences.getString("email", ""));
-            userPasswordEditText.setText(loginPreferences.getString("password", ""));
-            rememberMeSwitch.setChecked(true);
-        }
-
+        findById();
+        remeberMe();
     }
 
     public void loginPressed(View view) {
@@ -66,8 +57,27 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private void findById() {
+        userEmailEditText = (EditText) findViewById(R.id.user_email_edit_view);
+        userPasswordEditText = (EditText) findViewById(R.id.user_password_edit_view);
+        rememberMeSwitch = (Switch) findViewById(R.id.rememberme_switch);
+    }
+
+    private void remeberMe() {
+        loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        loginPrefsEditor = loginPreferences.edit();
+        saveLogin = loginPreferences.getBoolean("saveLogin", false);
+        if (saveLogin == true) {
+            userEmailEditText.setText(loginPreferences.getString("email", ""));
+            userPasswordEditText.setText(loginPreferences.getString("password", ""));
+            rememberMeSwitch.setChecked(true);
+        }
+    }
+
     private boolean areAllFieldsFilled() {
         boolean valid = true;
+        Pattern regexp;
+        Matcher matcher;
 
         String email = userEmailEditText.getText().toString();
         if (TextUtils.isEmpty(email)) {
@@ -75,6 +85,13 @@ public class LoginActivity extends AppCompatActivity {
             valid = false;
         } else {
             userEmailEditText.setError(null);
+            regexp = Pattern.compile("^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$");
+            matcher = regexp.matcher(email);
+            boolean result = matcher.matches();
+            if (!result) {
+                valid = false;
+                userEmailEditText.setError("Invalid email format");
+            }
         }
 
         String password = userPasswordEditText.getText().toString();

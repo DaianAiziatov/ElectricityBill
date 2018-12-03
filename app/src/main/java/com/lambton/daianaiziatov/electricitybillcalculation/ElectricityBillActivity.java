@@ -1,5 +1,6 @@
 package com.lambton.daianaiziatov.electricitybillcalculation;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
@@ -54,7 +55,67 @@ public class ElectricityBillActivity extends AppCompatActivity {
         electricityBill = new ElectricityBill();
         currentDate = new Date(System.currentTimeMillis());
         findById();
+        datePickerSetup();
+        setChangeListenerForGenderRadioGroup();
+        setChangeListenerForUnitsConsumedEditText();
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_my_bills: {
+                goToIntent(ListBillActivity.class);
+                break;
+            }
+            case R.id.menu_log_out: {
+                goToIntent(LoginActivity.class);
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setChangeListenerForUnitsConsumedEditText() {
+        unitsConsumedEitText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() != 0) {
+                    int units = Integer.parseInt(unitsConsumedEitText.getText().toString());
+                    totalTextView.setText("Total: $" + ElectricityBill.calculateTotal(units));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+    }
+
+    private void setChangeListenerForGenderRadioGroup() {
+        customerGenderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.male_radio_button: electricityBill.setGender("Male");
+                        break;
+                    case R.id.female_radio_button: electricityBill.setGender("Female");
+                        break;
+                    case R.id.other_radio_button: electricityBill.setGender("Other");
+                        break;
+                }
+            }
+        });
+    }
+
+    private void datePickerSetup() {
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -74,58 +135,6 @@ public class ElectricityBillActivity extends AppCompatActivity {
                         billDate.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
-
-        customerGenderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.male_radio_button: electricityBill.setGender("Male");
-                        break;
-                    case R.id.female_radio_button: electricityBill.setGender("Female");
-                        break;
-                    case R.id.other_radio_button: electricityBill.setGender("Other");
-                        break;
-                }
-            }
-        });
-        unitsConsumedEitText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() != 0) {
-                    int units = Integer.parseInt(unitsConsumedEitText.getText().toString());
-                    totalTextView.setText("Total: $" + ElectricityBill.calculateTotal(units));
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.menu_my_bills: {
-                Intent intent = new Intent(this, ListBillActivity.class);
-                this.startActivity(intent);
-                break;
-            }
-            case R.id.menu_log_out: {
-                Intent intent = new Intent(this, LoginActivity.class);
-                this.startActivity(intent);
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void confirmPressed(View view) {
@@ -265,5 +274,10 @@ public class ElectricityBillActivity extends AppCompatActivity {
                     }
                 });
         alertDialog.show();
+    }
+
+    private void goToIntent(Class<?> activity) {
+        Intent intent = new Intent(this, activity);
+        this.startActivity(intent);
     }
 }
