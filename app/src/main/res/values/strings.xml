@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Electricity Bill Calculation</string>
+    <string name="student_id">C0743383</string>
+    <string name="student_name">Daian Aiziatov</string>
+    <string name="user_email">User Email</string>
+    <string name="password">Password</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="login">Login</string>
+    <string name="customer_id">Customer ID</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_email">Customer Email</string>
+    <string name="units_consumed">Units Consumed</string>
+    <string name="confirm">Confirm</string>
+    <string name="date">Date</string>
+</resources>
